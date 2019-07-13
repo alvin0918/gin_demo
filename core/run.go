@@ -4,7 +4,8 @@ import (
 	"runtime"
 	"github.com/gin-gonic/gin"
 	"github.com/alvin0918/gin_demo/routers"
-	_ "github.com/alvin0918/gin_demo/core/config"
+	"github.com/alvin0918/gin_demo/core/config"
+	_ "github.com/alvin0918/gin_demo/core/commin/log"
 )
 
 func Run(){
@@ -23,7 +24,7 @@ func Run(){
 	routers.Init(r)
 
 	// 开始运行
-	r.Run("0.0.0.0:8060")
+	r.Run(config.GetIpAndPort("Server"))
 
 }
 

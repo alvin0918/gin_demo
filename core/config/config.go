@@ -2,7 +2,7 @@ package config
 
 import (
 	"gopkg.in/ini.v1"
-	"github.com/alvin0918/gin_demo/core"
+	"github.com/alvin0918/gin_demo/core/commin"
 )
 
 var Cfg *ini.File
@@ -18,7 +18,7 @@ func init() {
 
 	defaultConfigPath = "./config/app.ini"
 
-	if !core.FileExists(defaultConfigPath) {
+	if !commin.FileExists(defaultConfigPath) {
 		panic("The default configuration file ["+defaultConfigPath+"] does not exist")
 	}
 
@@ -35,6 +35,21 @@ func GetString(key string, section string) string {
 	return Cfg.Section(section).Key(key).String()
 }
 
+func GetIpAndPort(section string) string {
+	switch section {
+	case "Server":
+		return GetString("IP", "Server") + ":" + GetString("Port", "Server")
+
+	default:
+		return GetString("IP", "Server") + ":" + GetString("Port", "Server")
+	}
+
+}
+
+// 获取分区下的内容
+func GetSection(section string) (*ini.Section, error) {
+	return Cfg.GetSection(section)
+}
 
 
 
