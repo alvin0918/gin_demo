@@ -1,25 +1,28 @@
 package main
 
-import "log"
-
-//func main()  {
-//	//core.Run()
-//	//
-//	//var (
-//	//	res int64
-//	//	err error
-//	//)
-//	//
-//	//res, err = mysql.Insert("INSERT INTO person (first_name, last_name) VALUES ('chen', 'Alvin')", "Mysql_web1")
-//	//
-//	//fmt.Println(res)
-//	//fmt.Println(err)
-//	//
-//
-//
-//}
+import (
+	"github.com/alvin0918/gin_demo/core"
+)
 
 func main()  {
-
-	log.Println("ABC")
+	core.Run()
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

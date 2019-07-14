@@ -1,19 +1,13 @@
 package log
 
 import (
-	"github.com/aiwuTech/fileLogger"
-	"github.com/alvin0918/gin_demo/core/config"
-	"gopkg.in/ini.v1"
 	"time"
 	"encoding/json"
+	"gopkg.in/ini.v1"
+	"os"
+	"log"
+	"github.com/alvin0918/gin_demo/core/config"
 	"fmt"
-)
-
-var (
-	TRACE   *fileLogger.FileLogger
-	INFO    *fileLogger.FileLogger
-	WARN    *fileLogger.FileLogger
-	ERROR   *fileLogger.FileLogger
 )
 
 type Data struct {
@@ -27,82 +21,45 @@ type Data struct {
 	Agent 		string `json:"agent"`
 }
 
+func TracePrintf(f string, data string, v ...interface{})  {
+	go func(f string, data string, v ...interface{}) {
 
-func init() {
+		var (
+			section *ini.Section
+			err error
+			LoggerPath string
+			t time.Time
+			t_str string
+			name string
+			file *os.File
+			trace *log.Logger
+		)
 
-	var (
-		section *ini.Section
-		err error
-		LoggerPath string
-		t time.Time
-		t_str string
-	)
+		if section, err = config.GetSection("Logger"); err != nil {
+			panic(err)
+		}
 
-	if section, err = config.GetSection("Logger"); err != nil {
-		panic(err)
-	}
+		LoggerPath = section.Key("LoggerPath").String()
 
-	LoggerPath = section.Key("LoggerPath").String()
+		t = time.Now()
 
-	t = time.Now()
+		t_str = fmt.Sprintf("_%d_%d_%d.log", t.Year(), t.Month(), t.Day())
 
-	t_str = fmt.Sprintf("_%d_%d_%d_", t.Year(), t.Month(), t.Day())
+		name = LoggerPath + "/" + f + t_str
 
-	TRACE = fileLogger.NewDefaultLogger(LoggerPath, "trace"+t_str+".log")
-	INFO  = fileLogger.NewDefaultLogger(LoggerPath, "info"+t_str+".log")
-	WARN  = fileLogger.NewDefaultLogger(LoggerPath, "warn"+t_str+".log")
-	ERROR = fileLogger.NewDefaultLogger(LoggerPath, "error"+t_str+".log")
+		if file, err = os.OpenFile(name, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0644); err != nil {
+			panic(err)
+		}
 
-}
+		trace 	= log.New(file, "[" + f + "] ", log.Ldate|log.LUTC|log.Lmicroseconds|log.Llongfile)
 
-func TracePrintf(data string, v ...interface{})  {
+		trace.Print(data)
 
+		trace.Writer()
 
-	var (
-		res string
-	)
+		defer file.Close()
 
-	res = makeJson(data, "Trace", v)
-
-	defer TRACE.Close()
-	TRACE.Print(res)
-}
-
-
-func InfoPrintf(data string, v ...interface{})  {
-
-	var (
-		res string
-	)
-
-	res = makeJson(data, "Info", v)
-
-	defer INFO.Close()
-	INFO.Print(res)
-}
-
-func WarnPrintf(data string, v ...interface{})  {
-
-	var (
-		res string
-	)
-
-	res = makeJson(data, "Warn", v)
-
-	defer WARN.Close()
-	WARN.Print(res)
-}
-
-func ErrorPrintf(data string, v ...interface{})  {
-
-	var (
-		res string
-	)
-
-	res = makeJson(data, "Error", v)
-
-	defer ERROR.Close()
-	ERROR.E(res)
+	}(f, data, v)
 }
 
 // code int64, uri string, remode_addr string, request string, agent string

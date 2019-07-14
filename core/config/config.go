@@ -35,6 +35,7 @@ func GetString(key string, section string) string {
 	return Cfg.Section(section).Key(key).String()
 }
 
+// 获取系统IP Port
 func GetIpAndPort(section string) string {
 	switch section {
 	case "Server":
